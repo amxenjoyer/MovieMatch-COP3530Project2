@@ -1,0 +1,8 @@
+//
+// Created by Socks on 11/7/2026.
+//
+
+#ifndef MOVIEMATCH_RATINGKEY_H
+#define MOVIEMATCH_RATINGKEY_H
+
+#endif //MOVIEMATCH_RATINGKEY_H
