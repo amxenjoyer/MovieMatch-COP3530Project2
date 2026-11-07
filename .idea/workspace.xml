@@ -5,10 +5,12 @@
   </component>
   <component name="BackendCodeEditorMiscSettings">
     <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
   </component>
-  <component name="CMakePresetLoader"><![CDATA[{
-  "useNewFormat": true
-}]]></component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
   <component name="CMakeProjectFlavorService">
     <option name="flavorId" value="CMakePlainProjectFlavor" />
   </component>
@@ -27,17 +29,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4fc3ba91-96b3-471a-9d68-ac39579ee62c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/HashTable.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/Movie.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/Rating.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/RatingKey.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/HashTable.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/MovieMatch-COP3530Project2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MovieMatch-COP3530Project2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/MovieMatch.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/DataLoader.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/DataLoader.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Movie.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Movie.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Rating.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Rating.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/RatingKey.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/RatingKey.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,20 +57,25 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "amxenjoyer"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;amxenjoyer&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/amxenjoyer/MovieMatch-COP3530Project2.git",
-    "accountId": "56a51b68-48d4-4d92-a130-e2d1bc89e794"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/amxenjoyer/MovieMatch-COP3530Project2.git&quot;,
+    &quot;accountId&quot;: &quot;56a51b68-48d4-4d92-a130-e2d1bc89e794&quot;
   }
-}]]></component>
+}</component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="CLRV7p34" />
   </component>
@@ -79,10 +85,10 @@
     <option name="minorVersion" value="2.3" />
     <option name="productBranch" value="Classic" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3,
-  "fromUser": false
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3,
+  &quot;fromUser&quot;: false
+}</component>
   <component name="ProjectId" id="3LnJFRUBt1FzB3Td60FN50XLSRY" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -91,6 +97,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "CMake Application.MovieMatch.executor": "Run",
     "CidrDebugProfileConversion": "true",
     "RunOnceActivity.RadMigrateCodeStyle": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -102,7 +109,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "HashTable",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -113,6 +120,11 @@
     "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Socks\CLionProjects\MovieMatch\.idea" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
@@ -126,16 +138,8 @@
     </configuration>
   </component>
   <component name="SelectedDebugProfileService"><![CDATA[{
-  "profileIdByStamp": [
-    {
-      "first": {
-        "##RUN_CONFIGURATION##": "CMake Application.MovieMatch",
-        "cmake": "CMakeBuildProfile:Debug"
-      },
-      "second": "ebfc41b9-05d3-4b23-9e99-540950407c75"
-    }
-  ],
-  "modificationCount": 3
+  "profileIdByStamp": [],
+  "modificationCount": 4
 }]]></component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
