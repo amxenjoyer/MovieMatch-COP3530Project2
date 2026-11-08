@@ -228,6 +228,12 @@ MovieWindow::MovieWindow(QWidget* parent)
 
     connect(searchBar, &QLineEdit::returnPressed,
             this, [this]() { searchMovies(); });
+    connect(sortBox, &QComboBox::currentIndexChanged,
+        this, [this](int) {
+            if (catalog) {
+                searchMovies();
+            }
+        });
 
     //loading movies
     QTimer::singleShot(0, this, [this]() {
