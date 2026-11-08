@@ -545,11 +545,26 @@ void MovieWindow::searchMovies() {
     );
 
     if (count == 0) {
-        movieGrid->addWidget(
-            new QLabel("No matching movies found."),
-            0, 0
-        );
-        return;
+
+        if (count == 0) {
+            QLabel* message = new QLabel(
+                "No movies found matching your search.\n\n"
+                        "Try checking your spelling"
+            );
+
+            message->setAlignment(Qt::AlignCenter);
+            message->setWordWrap(true);
+
+            message->setStyleSheet(
+                "color: #b0bbcb;"
+                "font-size: 16px;"
+                "padding: 30px;"
+            );
+
+            movieGrid->addWidget(message, 0, 0);
+            return;
+        }
+
     }
 
     for (int i = 0; i < count; i++) {
