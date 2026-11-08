@@ -1,6 +1,8 @@
+
 #include "HashTable.h"
 
 #include <functional>
+#include <cstdint>
 
 HashTable::HashTable(size_t initialCapacity) {
     capacity = (initialCapacity == 0) ? 1 : initialCapacity;
@@ -10,14 +12,21 @@ HashTable::HashTable(size_t initialCapacity) {
 }
 
 size_t HashTable::hashFunction(const RatingKey& key) const {
-    size_t userHash = std::hash<int>{}(key.userId);
-    size_t movieHash = std::hash<int>{}(key.movieId);
+    // Combine user ID and movie ID into one 64-bit value
+    uint64_t combined =
+        (static_cast<uint64_t>(
+            static_cast<uint32_t>(key.userId)) << 32) |
+        static_cast<uint32_t>(key.movieId);
 
-    size_t combinedHash = userHash;
+    // Mix bits to distribute keys more evenly
+    combined += 0x9e3779b97f4a7c15ULL;
+    combined = (combined ^ (combined >> 30))
+               * 0xbf58476d1ce4e5b9ULL;
+    combined = (combined ^ (combined >> 27))
+               * 0x94d049bb133111ebULL;
+    combined ^= (combined >> 31);
 
-    combinedHash ^= movieHash + 0x9e3779b9 + (combinedHash << 6) + (combinedHash >> 2);
-
-    return combinedHash % capacity;
+    return static_cast<size_t>(combined % capacity);
 }
 
 bool HashTable::insert(const RatingKey& key, size_t ratingIndex) {
@@ -102,7 +111,8 @@ bool HashTable::search(const RatingKey& key, size_t& ratingIndex) const {
         }
 
         // check if current entry matches
-        if (table[currentIndex].state == SlotState::OCCUPIED && table[currentIndex].key == key) {
+        if (table[currentIndex].state == SlotState::OCCUPIED &&
+            table[currentIndex].key == key) {
             ratingIndex = table[currentIndex].ratingIndex;
             return true;
         }
@@ -111,7 +121,7 @@ bool HashTable::search(const RatingKey& key, size_t& ratingIndex) const {
     return false;
 }
 
-bool HashTable::remove(const RatingKey&key) {
+bool HashTable::remove(const RatingKey& key) {
     size_t index = hashFunction(key);
 
     for (size_t i = 0; i < capacity; i++) {
@@ -123,7 +133,8 @@ bool HashTable::remove(const RatingKey&key) {
         }
 
         // find matching key
-        if (table[currentIndex].state == SlotState::OCCUPIED && table[currentIndex].key == key) {
+        if (table[currentIndex].state == SlotState::OCCUPIED &&
+            table[currentIndex].key == key) {
             table[currentIndex].state = SlotState::DELETED;
             size--;
 
