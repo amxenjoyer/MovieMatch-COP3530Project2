@@ -1,5 +1,5 @@
 
-#include "MovieWindow.h"
+#include "../include/MovieWindow.h"
 
 #include <QApplication>
 #include <QDir>
