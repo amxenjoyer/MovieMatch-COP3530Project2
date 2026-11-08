@@ -12,6 +12,7 @@ add_executable(MovieMatch
         include/RatingKey.h
         include/DataLoader.h
         src/DataLoader.cpp
+        src/HashTable.cpp
 )
 
 target_include_directories(MovieMatch PRIVATE include)

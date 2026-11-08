@@ -7,7 +7,7 @@ struct RatingKey {
 
     // check if two keys are equal
     bool operator==(const RatingKey& other) const {
-        return userId == other.userId && moveId == other.movieId;
+        return userId == other.userId && movieId == other.movieId;
     }
 
     // compare keys for ordering
