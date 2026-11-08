@@ -9,6 +9,6 @@
 /dataSources/
 /dataSources.local.xml
 #Data files
-/data/
+/data/*.csv
 #xml smth
 .idea/workspace.xml
