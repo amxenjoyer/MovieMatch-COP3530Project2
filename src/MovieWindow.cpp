@@ -13,8 +13,10 @@
 
 #include <algorithm>
 #include <chrono>
+#include <iostream>
 #include <vector>
 #include <string>
+#include <stdexcept>
 
 using namespace std;
 
@@ -243,6 +245,7 @@ MovieWindow::MovieWindow(QWidget* parent)
 
 //get movielens dataset
 
+
 void MovieWindow::loadMovies() {
 
     // add the data sets to the data folder
@@ -282,16 +285,99 @@ void MovieWindow::loadMovies() {
     QApplication::processEvents();
 
     try {
-        catalog = MovieCatalog::load(
-            dataPath.toStdString()
-        );
+        catalog = MovieCatalog::load(dataPath.toStdString());
 
-        statusLabel->setText(
-            QString("Loaded %1 movies!")
-                .arg(catalog->movies().size())
-        );
+        const auto& ratings = catalog->indexedRatings();
+
+        std::cout << "Indexed rating records: "
+                  << catalog->indexedRatingCount()
+                  << std::endl;
+
+        // Test and time Hash Table rating lookups
+        std::size_t hashFound = 0;
+
+        auto hashStart = chrono::steady_clock::now();
+
+        for (const auto& rating : ratings) {
+            if (catalog->hashContainsRating(
+                    rating.userId, rating.movieId)) {
+                hashFound++;
+            }
+        }
+
+        auto hashEnd = chrono::steady_clock::now();
+
+        // Test and time B-Tree rating lookups
+        std::size_t treeFound = 0;
+
+        auto treeStart = chrono::steady_clock::now();
+
+        for (const auto& rating : ratings) {
+            if (catalog->treeContainsRating(
+                    rating.userId, rating.movieId)) {
+                treeFound++;
+            }
+        }
+
+        auto treeEnd = chrono::steady_clock::now();
+
+        auto hashTime =
+            chrono::duration_cast<chrono::microseconds>(
+                hashEnd - hashStart
+            ).count();
+
+        auto treeTime =
+            chrono::duration_cast<chrono::microseconds>(
+                treeEnd - treeStart
+            ).count();
+
+        // Verify that both structures found every rating
+        if (hashFound != ratings.size() ||
+            treeFound != ratings.size()) {
+            throw std::runtime_error(
+                "One or more rating lookups failed"
+            );
+        }
+
+        // Verify that nonexistent ratings are rejected
+        bool hashMissing = catalog->hashContainsRating(-1, -1);
+        bool treeMissing = catalog->treeContainsRating(-1, -1);
+
+        if (hashMissing || treeMissing) {
+            throw std::runtime_error(
+                "A nonexistent rating was incorrectly found"
+            );
+        }
+
+        std::cout << "Hash Table: "
+                  << hashFound << " found in "
+                  << hashTime << " us" << std::endl;
+
+        std::cout << "B-Tree: "
+                  << treeFound << " found in "
+                  << treeTime << " us" << std::endl;
+
+        std::cout << "Nonexistent rating rejected by both: Yes"
+                  << std::endl;
+
+        std::cout << "Rating index verification: PASSED"
+                  << std::endl;
 
         searchMovies();
+
+        statusLabel->setWordWrap(true);
+
+        statusLabel->setText(
+            QString("Loaded %1 movies | Indexed %2 ratings\n"
+                    "Rating lookups: Hash Table %3 us (%4 found) | "
+                    "B-Tree %5 us (%6 found)")
+                .arg(static_cast<qulonglong>(catalog->movies().size()))
+                .arg(static_cast<qulonglong>(ratings.size()))
+                .arg(hashTime)
+                .arg(static_cast<qulonglong>(hashFound))
+                .arg(treeTime)
+                .arg(static_cast<qulonglong>(treeFound))
+        );
     }
     catch (const exception& e) {
         QMessageBox::critical(
@@ -305,7 +391,8 @@ void MovieWindow::loadMovies() {
     loadButton->setEnabled(true);
 }
 
-//movie dislpay
+
+//movie display
 
 QWidget* MovieWindow::createMovieCard(
     const MovieDisplay& movie

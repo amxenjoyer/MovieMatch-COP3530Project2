@@ -1,5 +1,5 @@
 
-#include "../include/MovieCatalog.h"
+#include "MovieCatalog.h"
 #include "DataLoader.h"
 #include "RatingKey.h"
 
@@ -7,16 +7,13 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
+#include <string>
 
 namespace {
 
     RatingKey movieKey(int movieId) {
-        // Use userId 0 as a synthetic key
-        // to index movies using the existing HashTable.
-        RatingKey key{};
-        key.userId = 0;
-        key.movieId = movieId;
-        return key;
+        // Synthetic key for the existing movie index.
+        return RatingKey{0, movieId};
     }
 
 }
@@ -27,11 +24,13 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
     const std::string moviesPath = folder + "/movies.csv";
     const std::string ratingsPath = folder + "/ratings.csv";
 
+    const std::size_t MAX_INDEXED_RATINGS = 150000;
+
     auto catalog = std::shared_ptr<MovieCatalog>(
         new MovieCatalog()
     );
 
-    // use DataLoader for movies.csv
+    // Load movie information.
     std::vector<Movie> movies =
         DataLoader::loadMovies(moviesPath);
 
@@ -41,7 +40,7 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
     idToIndex.reserve(movies.size());
 
     for (Movie& movie : movies) {
-        auto index = catalog->records_.size();
+        std::size_t index = catalog->records_.size();
 
         idToIndex.emplace(movie.movieId, index);
 
@@ -50,7 +49,17 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
         });
     }
 
-    // read the ratings file
+    // Set up rating indexes.
+    catalog->indexedRatings_.reserve(MAX_INDEXED_RATINGS);
+
+    catalog->ratingHash_ = std::make_unique<HashTable>(
+        MAX_INDEXED_RATINGS * 2 + 1
+    );
+
+    catalog->ratingTree_ =
+        std::make_unique<RatingBTree>();
+
+    // Read ratings.csv one line at a time.
     std::ifstream file(ratingsPath);
 
     if (!file.is_open()) {
@@ -64,6 +73,8 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
     );
 
     std::string line;
+
+    // Skip CSV header.
     std::getline(file, line);
 
     while (std::getline(file, line)) {
@@ -73,48 +84,93 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
             continue;
         }
 
-        const auto second =
-            line.find(',', first + 1);
+        const auto second = line.find(',', first + 1);
 
         if (second == std::string::npos) {
             continue;
         }
 
-        const auto third =
-            line.find(',', second + 1);
+        const auto third = line.find(',', second + 1);
 
         if (third == std::string::npos) {
             continue;
         }
 
+        int userId;
+        int movieId;
+        double rating;
+
+        // Parse only the values needed from this row.
         try {
-            int movieId = std::stoi(
+            userId = std::stoi(
+                line.substr(0, first)
+            );
+
+            movieId = std::stoi(
                 line.substr(
                     first + 1,
                     second - first - 1
                 )
             );
 
-            auto it = idToIndex.find(movieId);
-
-            if (it == idToIndex.end()) {
-                continue;
-            }
-
-            double rating = std::stod(
+            rating = std::stod(
                 line.substr(
                     second + 1,
                     third - second - 1
                 )
             );
-
-            totals[it->second] += rating;
-
-            ++catalog->records_[
-                it->second
-            ].ratingCount;
         }
         catch (const std::exception&) {
+            continue;
+        }
+
+        // Find this rating's movie.
+        auto it = idToIndex.find(movieId);
+
+        if (it == idToIndex.end()) {
+            continue;
+        }
+
+        // Calculate averages using the full ratings file.
+        std::size_t movieIndex = it->second;
+
+        totals[movieIndex] += rating;
+
+        ++catalog->records_[movieIndex].ratingCount;
+
+        // Index 150,000 distinct real rating combinations.
+        if (catalog->indexedRatings_.size() <
+            MAX_INDEXED_RATINGS) {
+
+            RatingKey key{userId, movieId};
+
+            // Avoid indexing duplicate user/movie pairs.
+            std::size_t existingIndex = 0;
+
+            if (catalog->ratingHash_->search(
+                    key, existingIndex)) {
+                continue;
+            }
+
+            std::size_t ratingIndex =
+                catalog->indexedRatings_.size();
+
+            catalog->indexedRatings_.push_back({
+                userId, movieId, rating
+            });
+
+            if (!catalog->ratingHash_->insert(
+                    key, ratingIndex)) {
+                throw std::runtime_error(
+                    "Rating Hash Table insertion failed"
+                );
+            }
+
+            if (!catalog->ratingTree_->insert(key)) {
+                throw std::runtime_error(
+                    "Rating B-Tree insertion failed"
+                );
+            }
         }
     }
 
@@ -124,12 +180,11 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
         );
     }
 
-    //average rating
+    // Calculate the average rating for each movie.
     for (std::size_t i = 0;
          i < catalog->records_.size(); ++i) {
 
-        auto count =
-            catalog->records_[i].ratingCount;
+        auto count = catalog->records_[i].ratingCount;
 
         if (count > 0) {
             catalog->records_[i].averageRating =
@@ -137,7 +192,7 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
         }
     }
 
-    // movie indexes
+    // Build the original movie indexes.
     catalog->hash_ = std::make_unique<HashTable>(
         movies.size() * 2 + 1
     );
@@ -147,25 +202,37 @@ std::shared_ptr<MovieCatalog> MovieCatalog::load(
     for (std::size_t i = 0;
          i < catalog->records_.size(); ++i) {
 
-        int id =
-            catalog->records_[i].movie.movieId;
+        int id = catalog->records_[i].movie.movieId;
 
         if (!catalog->hash_->insert(
                 movieKey(id), i)) {
             throw std::runtime_error(
-                "Hash Table insertion failed"
+                "Movie Hash Table insertion failed"
             );
         }
 
         if (!catalog->tree_->insert(id)) {
             throw std::runtime_error(
-                "B-Tree insertion failed"
+                "Movie B-Tree insertion failed"
             );
         }
     }
 
+    // Verify both rating indexes contain the same count.
+    if (catalog->indexedRatings_.size() !=
+            catalog->ratingTree_->size() ||
+        catalog->indexedRatings_.size() !=
+            catalog->ratingHash_->getSize()) {
+
+        throw std::runtime_error(
+            "Rating indexes have different record counts"
+        );
+    }
+
     return catalog;
 }
+
+// Existing movie lookups
 
 bool MovieCatalog::hashContains(int movieId) const {
     std::size_t ignoredIndex = 0;
@@ -179,4 +246,35 @@ bool MovieCatalog::hashContains(int movieId) const {
 
 bool MovieCatalog::treeContains(int movieId) const {
     return tree_ && tree_->search(movieId);
+}
+
+// New rating lookups
+
+std::size_t MovieCatalog::indexedRatingCount() const {
+    return indexedRatings_.size();
+}
+
+bool MovieCatalog::hashContainsRating(
+    int userId, int movieId
+) const {
+    if (!ratingHash_) {
+        return false;
+    }
+
+    RatingKey key{userId, movieId};
+    std::size_t ratingIndex = 0;
+
+    return ratingHash_->search(key, ratingIndex);
+}
+
+bool MovieCatalog::treeContainsRating(
+    int userId, int movieId
+) const {
+    if (!ratingTree_) {
+        return false;
+    }
+
+    RatingKey key{userId, movieId};
+
+    return ratingTree_->search(key);
 }
