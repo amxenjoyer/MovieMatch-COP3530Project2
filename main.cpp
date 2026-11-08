@@ -1,13 +1,11 @@
 
 #include <QApplication>
-#include <QWidget>
+#include "MovieWindow.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
-    QWidget window;
-    window.setWindowTitle("MovieMatch");
-    window.resize(1000, 700);
+    MovieWindow window;
     window.show();
 
     return app.exec();
