@@ -18,7 +18,7 @@ size_t HashTable::hashFunction(const RatingKey& key) const {
             static_cast<uint32_t>(key.userId)) << 32) |
         static_cast<uint32_t>(key.movieId);
 
-    // Mix bits to distribute keys more evenly
+    // Mix bits to distribute keys more evenly, using finalizer from SplitMix64
     combined += 0x9e3779b97f4a7c15ULL;
     combined = (combined ^ (combined >> 30))
                * 0xbf58476d1ce4e5b9ULL;
