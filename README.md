@@ -39,7 +39,10 @@ Make sure CLion is using a compatible 64-bit MinGW compiler.
 
 ### 4. Running MovieMatch
 
-1. Make sure the data folder contains movies.csv and ratings.csv from the MovieLens 32M dataset.
+Due to github file size limits the data used by this project cannot be included in the repository.
+Please download and extract the ml-32m.zip file from https://grouplens.org/datasets/movielens/32m/
+
+1. Place the movies.csv and ratings.csv files into the provided /data directory.
 2. Reload CMake.
 3. Build the project using the hammer icon.
 4. Select MovieMatch and click the green Run button.
